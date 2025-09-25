@@ -15,5 +15,5 @@ node_modules
 
 #!.yarn/cache
 .pnp.*
-
+.env
 /src/generated/prisma
