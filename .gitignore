@@ -16,4 +16,7 @@ node_modules
 #!.yarn/cache
 .pnp.*
 .env
+env.local
+.env.*.local
+dist
 /src/generated/prisma
