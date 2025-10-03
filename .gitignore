@@ -23,3 +23,5 @@ env.local
 /build
 yarn.lock
 *.log
+tmp
+/tmp
