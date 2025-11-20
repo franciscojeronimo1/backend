@@ -19,7 +19,7 @@ node_modules
 env.local
 .env.*.local
 /src/generated/prisma
-/dist
+# /dist  # Removido para funcionar na Vercel com builds
 /build
 yarn.lock
 *.log
