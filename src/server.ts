@@ -31,10 +31,11 @@ app.use((err: Error, req:Request, res:Response, next:NextFunction)=> {
     })
 })
 
-// Exportar para Vercel
+// Exportar para Vercel (serverless)
 module.exports = app
 
 // Iniciar servidor apenas localmente
 if (require.main === module) {
-    app.listen(process.env.PORT || 3333, ()=> console.log('servidor online!!'))
+    const PORT = process.env.PORT || 3333
+    app.listen(PORT, ()=> console.log(`servidor online na porta ${PORT}!!`))
 }
