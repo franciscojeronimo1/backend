@@ -18,9 +18,7 @@ node_modules
 .env
 env.local
 .env.*.local
-/src/generated/prisma
-/dist
-/build
+
 yarn.lock
 *.log
 tmp
