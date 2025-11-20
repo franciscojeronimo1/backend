@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express, { Request, Response, NextFunction} from 'express'
 import 'express-async-errors'
 import cors from 'cors'
@@ -31,4 +32,10 @@ app.use((err: Error, req:Request, res:Response, next:NextFunction)=> {
     })
 })
 
-app.listen(process.env.PORT, ()=> console.log('servidor online!!'))
+// Exportar o app para a Vercel (serverless)
+export default app
+
+// Iniciar servidor apenas em desenvolvimento local
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(process.env.PORT || 3333, ()=> console.log('servidor online!!'))
+}
