@@ -1,5 +1,4 @@
-// Importar o app compilado
-import app from '../dist/server'
+import app from '../src/server'
 
 export default app
 
