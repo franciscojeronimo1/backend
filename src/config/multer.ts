@@ -1,18 +1,28 @@
 import crypto from "crypto";
 import multer from "multer";
-
-import { resolve, extname } from "path";
-
+import { resolve } from "path";
 
 export default{
     upload(folder: string){
-        return{
+
+        const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+        
+        if (isVercel) {
+
+            return {
+                storage: multer.memoryStorage(),
+            }
+        }
+        
+
+        return {
             storage: multer.diskStorage({
-                destination: resolve(__dirname, '..', '..',folder),
-                filename:(req, file, callback) =>{
+                destination: resolve(__dirname, '..', '..', folder),
+                filename: (req, file, callback) => {
                     const fileHash = crypto.randomBytes(16).toString('hex');
                     const fileName = `${fileHash}-${file.originalname}`;
-                    return callback(null, fileName)}
+                    return callback(null, fileName);
+                }
             })
         }
     }

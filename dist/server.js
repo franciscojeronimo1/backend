@@ -16,7 +16,13 @@ app.use((0, express_fileupload_1.default)({
 }));
 app.use((0, cors_1.default)());
 app.use(routes_1.router);
-app.use('/files', express_1.default.static(path_1.default.resolve(__dirname, '..', 'tmp')));
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    try {
+        app.use('/files', express_1.default.static(path_1.default.resolve(__dirname, '..', 'tmp')));
+    }
+    catch (error) {
+    }
+}
 app.use((err, req, res, next) => {
     if (err instanceof Error) {
         //Se for uma instancia do tipo error

@@ -8,6 +8,12 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = require("path");
 exports.default = {
     upload(folder) {
+        const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+        if (isVercel) {
+            return {
+                storage: multer_1.default.memoryStorage(),
+            };
+        }
         return {
             storage: multer_1.default.diskStorage({
                 destination: (0, path_1.resolve)(__dirname, '..', '..', folder),

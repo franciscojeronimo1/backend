@@ -15,7 +15,12 @@ app.use(cors())
 
 app.use(router)
 
-app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')))
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    try {
+        app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')))
+    } catch (error) {
+    }
+}
 
 app.use((err: Error, req:Request, res:Response, next:NextFunction)=> {
     if(err instanceof Error){
