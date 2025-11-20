@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import express, { Request, Response, NextFunction} from 'express'
 import 'express-async-errors'
 import cors from 'cors'
@@ -32,8 +31,10 @@ app.use((err: Error, req:Request, res:Response, next:NextFunction)=> {
     })
 })
 
-export default app
+// Exportar para Vercel
+module.exports = app
 
-if (process.env.NODE_ENV !== 'production') {
+// Iniciar servidor apenas localmente
+if (require.main === module) {
     app.listen(process.env.PORT || 3333, ()=> console.log('servidor online!!'))
 }
