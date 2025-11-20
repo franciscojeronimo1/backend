@@ -11,6 +11,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
 // cruar uma migration: yarn prisma migrate dev
 model User {
   id        String   @id @default(uuid())
