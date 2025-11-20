@@ -18,6 +18,7 @@ node_modules
 .env
 env.local
 .env.*.local
+.cursor/rules/*
 
 yarn.lock
 *.log
