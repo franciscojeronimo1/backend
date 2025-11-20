@@ -6,7 +6,7 @@
     "start": "node dist/server.js",
     "lint": "eslint",
     "build": "tsc --build",
-    "vercel-build": "prisma generate && prisma migrate deploy",
+    "vercel-build": "yarn build && prisma generate && prisma migrate deploy",
     "prisma:generate": "prisma generate"
   },
   "devDependencies": {
