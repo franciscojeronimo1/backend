@@ -20,6 +20,8 @@ app.use('/files', express_1.default.static(path_1.default.resolve(__dirname, '..
 app.use((err, req, res, next) => {
     if (err instanceof Error) {
         //Se for uma instancia do tipo error
+        console.error('Error:', err.message);
+        console.error('Stack:', err.stack);
         return res.status(400).json({
             error: err.message
         });
@@ -28,6 +30,13 @@ app.use((err, req, res, next) => {
         status: 'error',
         message: 'Internal server error.'
     });
+});
+// Middleware para capturar erros não tratados
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
 });
 // Exportar para Vercel (serverless)
 module.exports = app;
