@@ -8,12 +8,15 @@ import { DatailsUserController } from './controllers/user/DatailsUserController'
 import { CreateCategoryController } from './controllers/category/CreateCategoryController'
 import { ListCategoryController } from './controllers/category/ListCategoryController'
 import { DetailCategoryController } from './controllers/category/DetailCategoryController'
+import { DeleteCategoryController } from './controllers/category/DeleteCategoryController'
 
 import { CreateSizeController } from './controllers/size/CreateSizeController'
 import { ListSizesController } from './controllers/size/ListSizesController'
+import { DeleteSizeController } from './controllers/size/DeleteSizeController'
 
 import { CreateProductController } from './controllers/product/CreateProductController'
 import { ListByCategoryController } from './controllers/product/ListByCategoruController'
+import { DeleteProductController } from './controllers/product/DeleteProductController'
 
 import { CreateOrderController } from './controllers/order/CreateOrderController'
 import { RemoveOrderController } from './controllers/order/RemoveOrderController'
@@ -51,15 +54,21 @@ router.get('/category/product', isAuthenticated, new ListByCategoryController().
 
 router.get('/category/:category_id', isAuthenticated, new DetailCategoryController().handle)
 
+router.delete('/category', isAuthenticated, new DeleteCategoryController().handle)
+
 // -- ROTAS SIZE --
 router.post('/size', isAuthenticated, new CreateSizeController().handle)
 
 router.get('/sizes', isAuthenticated, new ListSizesController().handle)
 
+router.delete('/size', isAuthenticated, new DeleteSizeController().handle)
+
 //-- ROTAS PRODUCT --
 
 //router.post('/product', isAuthenticated, upload.single('file'), new CreateProductController().handle)
 router.post('/product', isAuthenticated, new CreateProductController().handle)
+
+router.delete('/product', isAuthenticated, new DeleteProductController().handle)
 
 // -- ROTAS ORDER --
 router.post('/order', isAuthenticated, new CreateOrderController().handle)
