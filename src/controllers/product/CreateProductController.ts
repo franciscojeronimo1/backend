@@ -12,37 +12,58 @@ cloudinary.config({
 
 class CreateProductController {
   async handle(req: Request, res: Response) {
-    const { name, price, description, category_id } = req.body;
+    const { name, price, description, category_id, has_custom_prices, custom_prices } = req.body;
 
     const createProductService = new CreateProductService();
 
-    if (!req.files || Object.keys(req.files).length === 0) {
-      throw new Error("Error upload file image");
-    } else {
+    let bannerUrl: string | undefined = undefined;
 
-     const file: UploadedFile = req.files['file']
+    // Upload de imagem é opcional
+    if (req.files && Object.keys(req.files).length > 0) {
+      const file: UploadedFile = req.files['file'] as UploadedFile;
 
-     const resultFile: UploadApiResponse = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream({}, function (error, result) {
-        if(error) {
-          reject(error)
+      if (file) {
+        try {
+          const resultFile: UploadApiResponse = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({}, function (error, result) {
+              if (error) {
+                reject(error);
+              }
+              resolve(result!);
+            }).end(file.data);
+          });
+
+          bannerUrl = resultFile.url;
+        } catch (error) {
+          throw new Error("Erro ao fazer upload da imagem");
         }
-
-        resolve(result)
-      }).end(file.data)
-     })
-
-
-      const product = await createProductService.execute({
-        name,
-        price,
-        description,
-        banner: resultFile.url,
-        category_id,
-      });
-
-      return res.json(product);
+      }
     }
+
+    // Parse custom_prices se vier como string JSON
+    let parsedCustomPrices = custom_prices;
+    if (custom_prices && typeof custom_prices === 'string') {
+      try {
+        parsedCustomPrices = JSON.parse(custom_prices);
+      } catch (error) {
+        throw new Error("custom_prices deve ser um JSON válido");
+      }
+    }
+
+    // Converter has_custom_prices para boolean se vier como string
+    const hasCustomPrices = has_custom_prices === true || has_custom_prices === 'true';
+
+    const product = await createProductService.execute({
+      name,
+      price,
+      description,
+      banner: bannerUrl,
+      category_id,
+      has_custom_prices: hasCustomPrices,
+      custom_prices: parsedCustomPrices
+    });
+
+    return res.json(product);
   }
 }
 export { CreateProductController };

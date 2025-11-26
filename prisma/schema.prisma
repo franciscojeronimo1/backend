@@ -26,29 +26,35 @@ model User {
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-
-
-  @@map("categories")
-  products Product[]
-}
-
-model Product {
   id          String   @id @default(uuid())
-  name        String
-  price       Float
-  description String
-  banner      String
+  name        String   @unique
+  has_sizes   Boolean  @default(false)
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now())
 
-  category   Category @relation(fields: [category_id], references: [id])
+  products    Product[]
+  size_prices CategorySizePrice[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                String   @id @default(uuid())
+  name              String
+  price             Float?   // Preço fixo (se não usar tamanhos)
+  description       String
+  banner            String?  // Imagem opcional
+  has_custom_prices Boolean  @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  category_id       String
+  category          Category @relation(fields: [category_id], references: [id])
+  
+  custom_prices     ProductSizePrice[]
+  items             Item[]
+
   @@map("products")
-  category_id String
-  items       Item[]
 }
 
 model order {
@@ -66,16 +72,58 @@ model order {
   items      Item[]
 }
 
+model ProductSize {
+  id              String   @id @default(uuid())
+  name            String   @unique  // "P", "M", "G", "F"
+  display         String   // "Pequena", "Média", "Grande", "Família"
+  order           Int      // Ordem de exibição
+
+  category_prices CategorySizePrice[]
+  product_prices  ProductSizePrice[]
+  items           Item[]
+
+  @@map("product_sizes")
+}
+
+model CategorySizePrice {
+  id          String   @id @default(uuid())
+  category_id String
+  size_id     String
+  price       Float
+
+  category    Category    @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  size        ProductSize @relation(fields: [size_id], references: [id], onDelete: Cascade)
+
+  @@unique([category_id, size_id])
+  @@map("category_size_prices")
+}
+
+model ProductSizePrice {
+  id          String   @id @default(uuid())
+  product_id  String
+  size_id     String
+  price       Float
+
+  product     Product     @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  size        ProductSize @relation(fields: [size_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, size_id])
+  @@map("product_size_prices")
+}
+
 model Item {
   id         String   @id @default(uuid())
   amount     Int
+  price      Float    // Preço no momento da venda (histórico)
+  size_id    String?
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
-  order      order    @relation(fields: [order_id], references: [id])
-  product    Product  @relation(fields: [product_id], references: [id])
-
-  @@map("items")
   order_id   String
   product_id String
+  order      order        @relation(fields: [order_id], references: [id])
+  product    Product      @relation(fields: [product_id], references: [id])
+  size       ProductSize? @relation(fields: [size_id], references: [id])
+
+  @@map("items")
 }

@@ -7,6 +7,10 @@ import { DatailsUserController } from './controllers/user/DatailsUserController'
 
 import { CreateCategoryController } from './controllers/category/CreateCategoryController'
 import { ListCategoryController } from './controllers/category/ListCategoryController'
+import { DetailCategoryController } from './controllers/category/DetailCategoryController'
+
+import { CreateSizeController } from './controllers/size/CreateSizeController'
+import { ListSizesController } from './controllers/size/ListSizesController'
 
 import { CreateProductController } from './controllers/product/CreateProductController'
 import { ListByCategoryController } from './controllers/product/ListByCategoruController'
@@ -42,12 +46,20 @@ router.post('/category', isAuthenticated, new CreateCategoryController().handle)
 
 router.get('/category', isAuthenticated, new ListCategoryController().handle)
 
+// IMPORTANTE: Rotas mais específicas devem vir ANTES de rotas com parâmetros
+router.get('/category/product', isAuthenticated, new ListByCategoryController().handle)
+
+router.get('/category/:category_id', isAuthenticated, new DetailCategoryController().handle)
+
+// -- ROTAS SIZE --
+router.post('/size', isAuthenticated, new CreateSizeController().handle)
+
+router.get('/sizes', isAuthenticated, new ListSizesController().handle)
+
 //-- ROTAS PRODUCT --
 
 //router.post('/product', isAuthenticated, upload.single('file'), new CreateProductController().handle)
 router.post('/product', isAuthenticated, new CreateProductController().handle)
-
-router.get('/category/product', isAuthenticated, new ListByCategoryController().handle)
 
 // -- ROTAS ORDER --
 router.post('/order', isAuthenticated, new CreateOrderController().handle)

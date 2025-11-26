@@ -1,8 +1,15 @@
 import prismaClient from "../../prisma";
 
-class ListCategoryService {
-    async execute() {
-        const categories = await prismaClient.category.findMany({
+interface CategoryRequest {
+    category_id: string;
+}
+
+class DetailCategoryService {
+    async execute({ category_id }: CategoryRequest) {
+        const category = await prismaClient.category.findUnique({
+            where: {
+                id: category_id
+            },
             include: {
                 size_prices: {
                     include: {
@@ -14,14 +21,14 @@ class ListCategoryService {
                         }
                     }
                 }
-            },
-            orderBy: {
-                created_at: 'desc'
             }
         });
 
-        // Formatar resposta
-        const formattedCategories = categories.map(category => ({
+        if (!category) {
+            throw new Error("Categoria não encontrada");
+        }
+
+        return {
             id: category.id,
             name: category.name,
             has_sizes: category.has_sizes,
@@ -38,10 +45,9 @@ class ListCategoryService {
             })),
             created_at: category.created_at,
             updated_at: category.updated_at
-        }));
-
-        return formattedCategories;
+        };
     }
 }
 
-export { ListCategoryService }
+export { DetailCategoryService };
+
