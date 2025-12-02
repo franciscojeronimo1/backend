@@ -20,30 +20,51 @@ cloudinary_1.v2.config({
 class CreateProductController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name, price, description, category_id } = req.body;
+            const { name, price, description, category_id, has_custom_prices, custom_prices } = req.body;
             const createProductService = new CreateProductService_1.CreateProductService();
-            if (!req.files || Object.keys(req.files).length === 0) {
-                throw new Error("Error upload file image");
-            }
-            else {
+            let bannerUrl = undefined;
+            // Upload de imagem é opcional
+            if (req.files && Object.keys(req.files).length > 0) {
                 const file = req.files['file'];
-                const resultFile = yield new Promise((resolve, reject) => {
-                    cloudinary_1.v2.uploader.upload_stream({}, function (error, result) {
-                        if (error) {
-                            reject(error);
-                        }
-                        resolve(result);
-                    }).end(file.data);
-                });
-                const product = yield createProductService.execute({
-                    name,
-                    price,
-                    description,
-                    banner: resultFile.url,
-                    category_id,
-                });
-                return res.json(product);
+                if (file) {
+                    try {
+                        const resultFile = yield new Promise((resolve, reject) => {
+                            cloudinary_1.v2.uploader.upload_stream({}, function (error, result) {
+                                if (error) {
+                                    reject(error);
+                                }
+                                resolve(result);
+                            }).end(file.data);
+                        });
+                        bannerUrl = resultFile.url;
+                    }
+                    catch (error) {
+                        throw new Error("Erro ao fazer upload da imagem");
+                    }
+                }
             }
+            // Parse custom_prices se vier como string JSON
+            let parsedCustomPrices = custom_prices;
+            if (custom_prices && typeof custom_prices === 'string') {
+                try {
+                    parsedCustomPrices = JSON.parse(custom_prices);
+                }
+                catch (error) {
+                    throw new Error("custom_prices deve ser um JSON válido");
+                }
+            }
+            // Converter has_custom_prices para boolean se vier como string
+            const hasCustomPrices = has_custom_prices === true || has_custom_prices === 'true';
+            const product = yield createProductService.execute({
+                name,
+                price,
+                description,
+                banner: bannerUrl,
+                category_id,
+                has_custom_prices: hasCustomPrices,
+                custom_prices: parsedCustomPrices
+            });
+            return res.json(product);
         });
     }
 }

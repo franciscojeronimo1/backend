@@ -8,24 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddItemController = void 0;
-const AdditemService_1 = require("../../services/order/AdditemService");
-class AddItemController {
-    handle(req, res) {
+exports.ListSizesService = void 0;
+const prisma_1 = __importDefault(require("../../prisma"));
+class ListSizesService {
+    execute() {
         return __awaiter(this, void 0, void 0, function* () {
-            const { order_id, product_id, amount, size_id, product_id_2, size_id_2 } = req.body;
-            const addItem = new AdditemService_1.AddItemService();
-            const item = yield addItem.execute({
-                order_id,
-                product_id,
-                amount,
-                size_id,
-                product_id_2,
-                size_id_2
+            const sizes = yield prisma_1.default.productSize.findMany({
+                orderBy: {
+                    order: 'asc'
+                }
             });
-            return res.json(item);
+            return sizes;
         });
     }
 }
-exports.AddItemController = AddItemController;
+exports.ListSizesService = ListSizesService;

@@ -9,23 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddItemController = void 0;
-const AdditemService_1 = require("../../services/order/AdditemService");
-class AddItemController {
+exports.DeleteSizeController = void 0;
+const DeleteSizeService_1 = require("../../services/size/DeleteSizeService");
+class DeleteSizeController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { order_id, product_id, amount, size_id, product_id_2, size_id_2 } = req.body;
-            const addItem = new AdditemService_1.AddItemService();
-            const item = yield addItem.execute({
-                order_id,
-                product_id,
-                amount,
-                size_id,
-                product_id_2,
-                size_id_2
-            });
-            return res.json(item);
+            const size_id = req.query.size_id;
+            const deleteSizeService = new DeleteSizeService_1.DeleteSizeService();
+            try {
+                const size = yield deleteSizeService.execute({ size_id });
+                return res.json(size);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }
-exports.AddItemController = AddItemController;
+exports.DeleteSizeController = DeleteSizeController;

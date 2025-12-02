@@ -16,15 +16,32 @@ exports.CreateCategoryService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateCategoryService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name }) {
+        return __awaiter(this, arguments, void 0, function* ({ name, has_sizes = false, size_prices = [] }) {
             if (name === '') {
                 throw new Error("Nome inválido");
             }
+            // Se tem tamanhos, validar que tem preços
+            if (has_sizes && size_prices.length === 0) {
+                throw new Error("Categoria com tamanhos deve ter preços definidos");
+            }
             const category = yield prisma_1.default.category.create({
                 data: {
-                    name: name
+                    name,
+                    has_sizes,
+                    size_prices: has_sizes && size_prices.length > 0 ? {
+                        create: size_prices.map(sp => ({
+                            size_id: sp.size_id,
+                            price: sp.price
+                        }))
+                    } : undefined
                 },
-                select: { id: true, name: true }
+                include: {
+                    size_prices: {
+                        include: {
+                            size: true
+                        }
+                    }
+                }
             });
             return category;
         });

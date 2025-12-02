@@ -9,23 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddItemController = void 0;
-const AdditemService_1 = require("../../services/order/AdditemService");
-class AddItemController {
+exports.CreateSizeController = void 0;
+const CreateSizeService_1 = require("../../services/size/CreateSizeService");
+class CreateSizeController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { order_id, product_id, amount, size_id, product_id_2, size_id_2 } = req.body;
-            const addItem = new AdditemService_1.AddItemService();
-            const item = yield addItem.execute({
-                order_id,
-                product_id,
-                amount,
-                size_id,
-                product_id_2,
-                size_id_2
+            const { name, display, order } = req.body;
+            const createSizeService = new CreateSizeService_1.CreateSizeService();
+            const size = yield createSizeService.execute({
+                name,
+                display,
+                order
             });
-            return res.json(item);
+            return res.json(size);
         });
     }
 }
-exports.AddItemController = AddItemController;
+exports.CreateSizeController = CreateSizeController;

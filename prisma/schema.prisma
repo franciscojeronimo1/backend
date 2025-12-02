@@ -53,6 +53,7 @@ model Product {
   
   custom_prices     ProductSizePrice[]
   items             Item[]
+  items_2           Item[]   @relation("ItemProduct2")
 
   @@map("products")
 }
@@ -81,6 +82,7 @@ model ProductSize {
   category_prices CategorySizePrice[]
   product_prices  ProductSizePrice[]
   items           Item[]
+  items_2         Item[]   @relation("ItemSize2")
 
   @@map("product_sizes")
 }
@@ -112,18 +114,22 @@ model ProductSizePrice {
 }
 
 model Item {
-  id         String   @id @default(uuid())
-  amount     Int
-  price      Float    // Preço no momento da venda (histórico)
-  size_id    String?
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  id          String   @id @default(uuid())
+  amount      Int
+  price       Float    // Preço no momento da venda (histórico)
+  size_id     String?
+  product_id_2 String?  // Segundo sabor (pizza meia a meia)
+  size_id_2   String?  // Tamanho do segundo sabor (deve ser igual a size_id)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
 
-  order_id   String
-  product_id String
-  order      order        @relation(fields: [order_id], references: [id])
-  product    Product      @relation(fields: [product_id], references: [id])
-  size       ProductSize? @relation(fields: [size_id], references: [id])
+  order_id    String
+  product_id  String
+  order       order        @relation(fields: [order_id], references: [id])
+  product     Product      @relation(fields: [product_id], references: [id])
+  size        ProductSize? @relation(fields: [size_id], references: [id])
+  product_2   Product?     @relation("ItemProduct2", fields: [product_id_2], references: [id])
+  size_2      ProductSize? @relation("ItemSize2", fields: [size_id_2], references: [id])
 
   @@map("items")
 }

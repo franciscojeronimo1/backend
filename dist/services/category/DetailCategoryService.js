@@ -12,12 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ListCategoryService = void 0;
+exports.DetailCategoryService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
-class ListCategoryService {
-    execute() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const categories = yield prisma_1.default.category.findMany({
+class DetailCategoryService {
+    execute(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ category_id }) {
+            const category = yield prisma_1.default.category.findUnique({
+                where: {
+                    id: category_id
+                },
                 include: {
                     size_prices: {
                         include: {
@@ -29,13 +32,12 @@ class ListCategoryService {
                             }
                         }
                     }
-                },
-                orderBy: {
-                    created_at: 'desc'
                 }
             });
-            // Formatar resposta
-            const formattedCategories = categories.map(category => ({
+            if (!category) {
+                throw new Error("Categoria não encontrada");
+            }
+            return {
                 id: category.id,
                 name: category.name,
                 has_sizes: category.has_sizes,
@@ -52,9 +54,8 @@ class ListCategoryService {
                 })),
                 created_at: category.created_at,
                 updated_at: category.updated_at
-            }));
-            return formattedCategories;
+            };
         });
     }
 }
-exports.ListCategoryService = ListCategoryService;
+exports.DetailCategoryService = DetailCategoryService;

@@ -12,6 +12,9 @@ class DetailOrderService {
       },
       include: {
         product: true,
+        product_2: true,
+        size: true,
+        size_2: true,
         order: true,
       },
     });

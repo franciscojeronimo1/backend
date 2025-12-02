@@ -14,10 +14,12 @@ const CreateCategoryService_1 = require("../../services/category/CreateCategoryS
 class CreateCategoryController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name } = req.body;
+            const { name, has_sizes, size_prices } = req.body;
             const createCategoryService = new CreateCategoryService_1.CreateCategoryService();
             const category = yield createCategoryService.execute({
-                name
+                name,
+                has_sizes,
+                size_prices
             });
             return res.json(category);
         });

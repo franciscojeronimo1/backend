@@ -12,25 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DetailOrderService = void 0;
+exports.CreateSizeService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
-class DetailOrderService {
+class CreateSizeService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ order_id }) {
-            const orders = yield prisma_1.default.item.findMany({
-                where: {
-                    order_id: order_id,
-                },
-                include: {
-                    product: true,
-                    product_2: true,
-                    size: true,
-                    size_2: true,
-                    order: true,
-                },
+        return __awaiter(this, arguments, void 0, function* ({ name, display, order }) {
+            // Verificar se já existe
+            const existingSize = yield prisma_1.default.productSize.findUnique({
+                where: { name }
             });
-            return orders;
+            if (existingSize) {
+                throw new Error("Tamanho já existe");
+            }
+            const size = yield prisma_1.default.productSize.create({
+                data: {
+                    name,
+                    display,
+                    order
+                }
+            });
+            return size;
         });
     }
 }
-exports.DetailOrderService = DetailOrderService;
+exports.CreateSizeService = CreateSizeService;
