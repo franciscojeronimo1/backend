@@ -64,6 +64,7 @@ model order {
   status     Boolean  @default(false)
   drafted    Boolean  @default(true)
   name      String?
+  address    String?  // Endereço de entrega (opcional)
 
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
