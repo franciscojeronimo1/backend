@@ -11,7 +11,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+enum PaymentMethod {
+  PIX
+  CARTAO
+  DINHEIRO
+  OUTROS
+}
 
 // cruar uma migration: yarn prisma migrate dev
 model User {
@@ -59,19 +64,20 @@ model Product {
 }
 
 model order {
-  id         String   @id @default(uuid())
-  table      Int
-  status     Boolean  @default(false)
-  drafted    Boolean  @default(true)
-  name      String?
-  address    String?  // Endereço de entrega (opcional)
+  id             String        @id @default(uuid())
+  table          Int
+  status         Boolean       @default(false)
+  drafted        Boolean       @default(true)
+  name           String?
+  address        String?       // Endereço de entrega (opcional)
+  payment_method PaymentMethod? // Forma de pagamento (opcional)
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @default(now())
 
 
   @@map("orders")
-  items      Item[]
+  items          Item[]
 }
 
 model ProductSize {
