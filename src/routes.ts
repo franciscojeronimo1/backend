@@ -28,6 +28,7 @@ import { SendOrderController } from './controllers/order/SendOrderController'
 import { ListOrderController } from './controllers/order/ListOrderController'
 import { DetailOrderController } from './controllers/order/DetailOrderController'
 import { FinishOrderController } from './controllers/order/FInishOrderController'
+import { SearchClientsController } from './controllers/order/SearchClientsController'
 
 import { isAuthenticated } from './middlewares/isAuthenticated'
 
@@ -71,6 +72,7 @@ router.post('/product', isAuthenticated, new CreateProductController().handle)
 router.delete('/product', isAuthenticated, new DeleteProductController().handle)
 
 // -- ROTAS ORDER --
+router.get('/order/clients', isAuthenticated, new SearchClientsController().handle)
 router.post('/order', isAuthenticated, new CreateOrderController().handle)
 router.delete('/order', isAuthenticated, new RemoveOrderController().handle)
 
