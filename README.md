@@ -162,7 +162,7 @@ Este projeto está sob a licença MIT.
 
 ## 👨‍💻 Autor
 
-Desenvolvido com ❤️ para gerenciamento de pizzarias da minha Mae
+Desenvolvido com ❤️ para gerenciamento de pizzaria da minha Mae
 
 ---
 
