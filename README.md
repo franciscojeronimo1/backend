@@ -161,7 +161,7 @@ O projeto está configurado para deploy serverless na Vercel:
 Este projeto está sob a licença MIT.
 
 ## 👨‍💻 Autor
-
+**Francisco**
 Desenvolvido com ❤️ para gerenciamento de pizzaria da minha Mae
 
 ---
