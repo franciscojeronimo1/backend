@@ -8,6 +8,7 @@ class DetailCategoryController {
         const detailCategoryService = new DetailCategoryService();
 
         const category = await detailCategoryService.execute({
+            user_id: req.user_id,
             category_id
         });
 

@@ -1,8 +1,11 @@
 import prismaClient from "../../prisma";
 
 class ListCategoryService {
-    async execute() {
+    async execute(user_id: string) {
         const categories = await prismaClient.category.findMany({
+            where: {
+                user_id
+            },
             include: {
                 size_prices: {
                     include: {

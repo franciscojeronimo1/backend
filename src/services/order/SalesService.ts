@@ -1,6 +1,7 @@
 import prismaClient from "../../prisma";
 
 interface SalesRequest {
+  user_id: string;
   period: 'day' | 'week' | 'month' | 'custom';
   date?: string;
   start_date?: string;
@@ -65,7 +66,7 @@ class SalesService {
     return { start, end };
   }
 
-  async execute({ period, date, start_date, end_date }: SalesRequest) {
+  async execute({ user_id, period, date, start_date, end_date }: SalesRequest) {
     if (period === 'custom' && (!start_date || !end_date)) {
       throw new Error("start_date e end_date são obrigatórios para período customizado");
     }
@@ -74,6 +75,7 @@ class SalesService {
 
     const orders = await prismaClient.order.findMany({
       where: {
+        user_id,
         status: true,
         created_at: {
           gte: start,

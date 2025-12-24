@@ -1,14 +1,16 @@
 import prismaClient from "../../prisma";
 
 interface SearchClientsRequest {
+    user_id: string;
     search: string;
 }
 
 class SearchClientsService {
-    async execute({ search }: SearchClientsRequest) {
-        // Busca pedidos onde o nome contém o termo de busca (case insensitive)
+    async execute({ user_id, search }: SearchClientsRequest) {
+        // Busca pedidos onde o nome contém o termo de busca (case insensitive) e pertence ao usuário
         const orders = await prismaClient.order.findMany({
             where: {
+                user_id,
                 name: {
                     not: null,
                     contains: search,

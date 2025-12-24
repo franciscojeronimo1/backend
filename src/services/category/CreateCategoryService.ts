@@ -6,13 +6,14 @@ interface SizePrice {
 }
 
 interface CategoryRequest {
+    user_id: string;
     name: string;
     has_sizes?: boolean;
     size_prices?: SizePrice[];
 }
 
 class CreateCategoryService {
-    async execute({ name, has_sizes = false, size_prices = [] }: CategoryRequest) {
+    async execute({ user_id, name, has_sizes = false, size_prices = [] }: CategoryRequest) {
         if (name === '') {
             throw new Error("Nome inválido");
         }
@@ -24,6 +25,7 @@ class CreateCategoryService {
 
         const category = await prismaClient.category.create({
             data: {
+                user_id,
                 name,
                 has_sizes,
                 size_prices: has_sizes && size_prices.length > 0 ? {

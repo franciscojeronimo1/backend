@@ -1,14 +1,18 @@
 import prismaClient from "../../prisma";
 
 interface ProductRequest {
+    user_id: string;
     category_id: string;
 }
 
 class ListByCategoryService {
-    async execute({category_id}: ProductRequest ) {
-        // Verificar se categoria existe
-        const category = await prismaClient.category.findUnique({
-            where: { id: category_id },
+    async execute({user_id, category_id}: ProductRequest ) {
+        // Verificar se categoria existe e pertence ao usuário
+        const category = await prismaClient.category.findFirst({
+            where: { 
+                id: category_id,
+                user_id
+            },
             include: {
                 size_prices: {
                     include: {
@@ -24,12 +28,13 @@ class ListByCategoryService {
         });
 
         if (!category) {
-            throw new Error("Categoria não encontrada");
+            throw new Error("Categoria não encontrada ou você não tem permissão para acessá-la");
         }
 
         const products = await prismaClient.product.findMany({
             where: {
-                category_id: category_id
+                category_id: category_id,
+                user_id
             },
             include: {
                 custom_prices: {

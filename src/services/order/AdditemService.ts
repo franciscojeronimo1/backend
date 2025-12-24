@@ -1,6 +1,7 @@
 import prismaClient from "../../prisma";
 
 interface ItemRequest {
+    user_id: string;
     order_id: string;
     product_id: string;
     amount: number;
@@ -11,9 +12,12 @@ interface ItemRequest {
 
 class AddItemService {
     // Função auxiliar para buscar o preço de um produto
-    private async getProductPrice(productId: string, sizeId: string | undefined): Promise<number> {
-        const product = await prismaClient.product.findUnique({
-            where: { id: productId },
+    private async getProductPrice(user_id: string, productId: string, sizeId: string | undefined): Promise<number> {
+        const product = await prismaClient.product.findFirst({
+            where: { 
+                id: productId,
+                user_id
+            },
             include: {
                 category: {
                     include: {
@@ -33,17 +37,20 @@ class AddItemService {
         });
 
         if (!product) {
-            throw new Error("Produto não encontrado");
+            throw new Error("Produto não encontrado ou você não tem permissão para acessá-lo");
         }
 
         if (sizeId) {
-            // Verificar se tamanho existe
-            const size = await prismaClient.productSize.findUnique({
-                where: { id: sizeId }
+            // Verificar se tamanho existe e pertence ao usuário
+            const size = await prismaClient.productSize.findFirst({
+                where: { 
+                    id: sizeId,
+                    user_id
+                }
             });
 
             if (!size) {
-                throw new Error("Tamanho não encontrado");
+                throw new Error("Tamanho não encontrado ou você não tem permissão para acessá-lo");
             }
 
             // Se produto tem preços customizados, usar eles
@@ -79,14 +86,17 @@ class AddItemService {
         }
     }
 
-    async execute({ order_id, product_id, amount, size_id, product_id_2, size_id_2 }: ItemRequest) {
-        // Verificar se pedido existe
-        const order = await prismaClient.order.findUnique({
-            where: { id: order_id }
+    async execute({ user_id, order_id, product_id, amount, size_id, product_id_2, size_id_2 }: ItemRequest) {
+        // Verificar se pedido existe e pertence ao usuário
+        const order = await prismaClient.order.findFirst({
+            where: { 
+                id: order_id,
+                user_id
+            }
         });
 
         if (!order) {
-            throw new Error("Pedido não encontrado");
+            throw new Error("Pedido não encontrado ou você não tem permissão para acessá-lo");
         }
 
         // Validações para pizza meia a meia
@@ -111,16 +121,22 @@ class AddItemService {
                 throw new Error("Os sabores devem ser diferentes");
             }
 
-            // Buscar ambos os produtos para validação
-            const product1 = await prismaClient.product.findUnique({
-                where: { id: product_id },
+            // Buscar ambos os produtos para validação (verificando user_id)
+            const product1 = await prismaClient.product.findFirst({
+                where: { 
+                    id: product_id,
+                    user_id
+                },
                 include: {
                     category: true
                 }
             });
 
-            const product2 = await prismaClient.product.findUnique({
-                where: { id: product_id_2 },
+            const product2 = await prismaClient.product.findFirst({
+                where: { 
+                    id: product_id_2,
+                    user_id
+                },
                 include: {
                     category: true
                 }
@@ -136,8 +152,8 @@ class AddItemService {
             }
 
             // Buscar preços de ambos os produtos
-            const price1 = await this.getProductPrice(product_id, size_id);
-            const price2 = await this.getProductPrice(product_id_2, size_id_2);
+            const price1 = await this.getProductPrice(user_id, product_id, size_id);
+            const price2 = await this.getProductPrice(user_id, product_id_2, size_id_2);
 
             // Usar o maior preço
             const finalPrice = Math.max(price1, price2);
@@ -164,9 +180,12 @@ class AddItemService {
             return item;
         } else {
             // Item normal (sem meia a meia)
-            // Buscar produto com categoria e preços
-            const product = await prismaClient.product.findUnique({
-                where: { id: product_id },
+            // Buscar produto com categoria e preços (verificando user_id)
+            const product = await prismaClient.product.findFirst({
+                where: { 
+                    id: product_id,
+                    user_id
+                },
                 include: {
                     category: {
                         include: {
@@ -186,10 +205,10 @@ class AddItemService {
             });
 
             if (!product) {
-                throw new Error("Produto não encontrado");
+                throw new Error("Produto não encontrado ou você não tem permissão para acessá-lo");
             }
 
-            const price = await this.getProductPrice(product_id, size_id);
+            const price = await this.getProductPrice(user_id, product_id, size_id);
 
             // Criar item com preço
             const item = await prismaClient.item.create({

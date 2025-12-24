@@ -1,14 +1,18 @@
 import prismaClient from "../../prisma";
 
 interface SizeRequest {
+  user_id: string;
   size_id: string;
 }
 
 class DeleteSizeService {
-  async execute({ size_id }: SizeRequest) {
-    // Verificar se tamanho existe
-    const size = await prismaClient.productSize.findUnique({
-      where: { id: size_id },
+  async execute({ user_id, size_id }: SizeRequest) {
+    // Verificar se tamanho existe e pertence ao usuário
+    const size = await prismaClient.productSize.findFirst({
+      where: { 
+        id: size_id,
+        user_id
+      },
       include: {
         category_prices: true,
         product_prices: true,
@@ -17,7 +21,7 @@ class DeleteSizeService {
     });
 
     if (!size) {
-      throw new Error("Tamanho não encontrado");
+      throw new Error("Tamanho não encontrado ou você não tem permissão para deletá-lo");
     }
 
     // Verificar se tamanho está sendo usado

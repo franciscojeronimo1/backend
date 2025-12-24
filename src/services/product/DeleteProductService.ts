@@ -1,21 +1,25 @@
 import prismaClient from "../../prisma";
 
 interface ProductRequest {
+  user_id: string;
   product_id: string;
 }
 
 class DeleteProductService {
-  async execute({ product_id }: ProductRequest) {
-    // Verificar se produto existe e se tem itens associados
-    const product = await prismaClient.product.findUnique({
-      where: { id: product_id },
+  async execute({ user_id, product_id }: ProductRequest) {
+    // Verificar se produto existe, pertence ao usuário e se tem itens associados
+    const product = await prismaClient.product.findFirst({
+      where: { 
+        id: product_id,
+        user_id
+      },
       include: {
         items: true,
       },
     });
 
     if (!product) {
-      throw new Error("Produto não encontrado");
+      throw new Error("Produto não encontrado ou você não tem permissão para deletá-lo");
     }
 
     // Verificar se produto está sendo usado em pedidos

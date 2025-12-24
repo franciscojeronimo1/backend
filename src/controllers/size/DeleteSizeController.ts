@@ -8,7 +8,10 @@ class DeleteSizeController {
     const deleteSizeService = new DeleteSizeService();
 
     try {
-      const size = await deleteSizeService.execute({ size_id });
+      const size = await deleteSizeService.execute({ 
+        user_id: req.user_id,
+        size_id 
+      });
       return res.json(size);
     } catch (error) {
       if (error instanceof Error) {

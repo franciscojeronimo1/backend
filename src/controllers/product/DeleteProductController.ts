@@ -8,7 +8,10 @@ class DeleteProductController {
     const deleteProductService = new DeleteProductService();
 
     try {
-      const product = await deleteProductService.execute({ product_id });
+      const product = await deleteProductService.execute({ 
+        user_id: req.user_id,
+        product_id 
+      });
       return res.json(product);
     } catch (error) {
       if (error instanceof Error) {

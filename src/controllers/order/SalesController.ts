@@ -15,6 +15,7 @@ class SalesController {
 
       const salesService = new SalesService();
       const result = await salesService.execute({
+        user_id: req.user_id,
         period: period as 'day' | 'week' | 'month' | 'custom',
         date: date as string | undefined,
         start_date: start_date as string | undefined,

@@ -7,6 +7,7 @@ class CreateCategoryController {
         const createCategoryService = new CreateCategoryService();
         
         const category = await createCategoryService.execute({
+            user_id: req.user_id,
             name,
             has_sizes,
             size_prices

@@ -8,7 +8,10 @@ class DeleteCategoryController {
     const deleteCategoryService = new DeleteCategoryService();
 
     try {
-      const category = await deleteCategoryService.execute({ category_id });
+      const category = await deleteCategoryService.execute({ 
+        user_id: req.user_id,
+        category_id 
+      });
       return res.json(category);
     } catch (error) {
       if (error instanceof Error) {

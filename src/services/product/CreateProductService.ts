@@ -6,6 +6,7 @@ interface SizePrice {
 }
 
 interface ProductRequest {
+  user_id: string;
   name: string;
   price?: string;
   description: string;
@@ -17,6 +18,7 @@ interface ProductRequest {
 
 class CreateProductService {
   async execute({
+    user_id,
     name,
     price,
     description,
@@ -25,13 +27,16 @@ class CreateProductService {
     has_custom_prices = false,
     custom_prices = [],
   }: ProductRequest) {
-    // Verificar se categoria existe
-    const category = await prismaClient.category.findUnique({
-      where: { id: category_id },
+    // Verificar se categoria existe e pertence ao usuário
+    const category = await prismaClient.category.findFirst({
+      where: { 
+        id: category_id,
+        user_id
+      },
     });
 
     if (!category) {
-      throw new Error("Categoria não encontrada");
+      throw new Error("Categoria não encontrada ou você não tem permissão para acessá-la");
     }
 
     // Se categoria não tem tamanhos, produto deve ter preço fixo
@@ -71,6 +76,7 @@ class CreateProductService {
     // Mas vamos permitir para compatibilidade com produtos antigos
     const product = await prismaClient.product.create({
       data: {
+        user_id,
         name,
         price: price ? Number(price) : null,
         description,

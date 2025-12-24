@@ -54,6 +54,7 @@ class CreateProductController {
     const hasCustomPrices = has_custom_prices === true || has_custom_prices === 'true';
 
     const product = await createProductService.execute({
+      user_id: req.user_id,
       name,
       price,
       description,

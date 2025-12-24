@@ -1,14 +1,16 @@
 import prismaClient from "../../prisma";
 
 interface CategoryRequest {
+    user_id: string;
     category_id: string;
 }
 
 class DetailCategoryService {
-    async execute({ category_id }: CategoryRequest) {
-        const category = await prismaClient.category.findUnique({
+    async execute({ user_id, category_id }: CategoryRequest) {
+        const category = await prismaClient.category.findFirst({
             where: {
-                id: category_id
+                id: category_id,
+                user_id
             },
             include: {
                 size_prices: {
@@ -25,7 +27,7 @@ class DetailCategoryService {
         });
 
         if (!category) {
-            throw new Error("Categoria não encontrada");
+            throw new Error("Categoria não encontrada ou você não tem permissão para acessá-la");
         }
 
         return {

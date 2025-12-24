@@ -7,6 +7,7 @@ class CreateSizeController {
 
         const createSizeService = new CreateSizeService();
         const size = await createSizeService.execute({
+            user_id: req.user_id,
             name,
             display,
             order

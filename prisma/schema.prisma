@@ -27,19 +27,27 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 
+  categories Category[]
+  products   Product[]
+  orders     order[]
+  sizes      ProductSize[]
+
   @@map("users")
 }
 
 model Category {
   id          String   @id @default(uuid())
-  name        String   @unique
+  name        String
   has_sizes   Boolean  @default(false)
+  user_id     String
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now())
 
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   products    Product[]
   size_prices CategorySizePrice[]
 
+  @@unique([user_id, name])
   @@map("categories")
 }
 
@@ -50,11 +58,13 @@ model Product {
   description       String
   banner            String?  // Imagem opcional
   has_custom_prices Boolean  @default(false)
+  user_id           String
   created_at        DateTime @default(now())
   updated_at        DateTime @default(now())
 
+  user              User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   category_id       String
-  category          Category @relation(fields: [category_id], references: [id])
+  category          Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
   
   custom_prices     ProductSizePrice[]
   items             Item[]
@@ -71,26 +81,31 @@ model order {
   name           String?
   address        String?       // Endereço de entrega (opcional)
   payment_method PaymentMethod? // Forma de pagamento (opcional)
+  user_id        String
 
   created_at     DateTime      @default(now())
   updated_at     DateTime      @default(now())
 
+  user           User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  items          Item[]
 
   @@map("orders")
-  items          Item[]
 }
 
 model ProductSize {
   id              String   @id @default(uuid())
-  name            String   @unique  // "P", "M", "G", "F"
+  name            String   // "P", "M", "G", "F"
   display         String   // "Pequena", "Média", "Grande", "Família"
   order           Int      // Ordem de exibição
+  user_id         String
 
+  user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   category_prices CategorySizePrice[]
   product_prices  ProductSizePrice[]
   items           Item[]
   items_2         Item[]   @relation("ItemSize2")
 
+  @@unique([user_id, name])
   @@map("product_sizes")
 }
 

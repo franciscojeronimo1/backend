@@ -1,16 +1,20 @@
 import prismaClient from "../../prisma";
 
 interface SizeRequest {
+    user_id: string;
     name: string;
     display: string;
     order: number;
 }
 
 class CreateSizeService {
-    async execute({ name, display, order }: SizeRequest) {
-        // Verificar se já existe
-        const existingSize = await prismaClient.productSize.findUnique({
-            where: { name }
+    async execute({ user_id, name, display, order }: SizeRequest) {
+        // Verificar se já existe para este usuário
+        const existingSize = await prismaClient.productSize.findFirst({
+            where: { 
+                name,
+                user_id
+            }
         });
 
         if (existingSize) {
@@ -19,6 +23,7 @@ class CreateSizeService {
 
         const size = await prismaClient.productSize.create({
             data: {
+                user_id,
                 name,
                 display,
                 order
