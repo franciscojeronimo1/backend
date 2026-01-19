@@ -1,21 +1,30 @@
 import {PrismaClient} from '@prisma/client'
 
+// Singleton pattern para ambiente serverless (Vercel)
+declare global {
+    var prisma: PrismaClient | undefined
+}
+
 let prismaClient: PrismaClient
 
-try {
-    prismaClient = new PrismaClient({
-        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+if (process.env.NODE_ENV === 'production') {
+    // Em produção/serverless, usar instância global se existir
+    prismaClient = global.prisma || new PrismaClient({
+        log: ['error'],
     })
-    
-    // Verificar conexão apenas em desenvolvimento
-    if (process.env.NODE_ENV !== 'production') {
-        prismaClient.$connect().catch((error) => {
-            console.error('Erro ao conectar com o banco de dados:', error)
-        })
-    }
-} catch (error) {
-    console.error('Erro ao inicializar Prisma Client:', error)
-    throw error
+    global.prisma = prismaClient
+} else {
+    // Em desenvolvimento, criar nova instância
+    prismaClient = new PrismaClient({
+        log: ['query', 'error', 'warn'],
+    })
+}
+
+// Verificar conexão apenas em desenvolvimento
+if (process.env.NODE_ENV !== 'production') {
+    prismaClient.$connect().catch((error) => {
+        console.error('Erro ao conectar com o banco de dados:', error)
+    })
 }
 
 export default prismaClient
