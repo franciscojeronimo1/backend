@@ -16,7 +16,17 @@ exports.RemoveOrderService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class RemoveOrderService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ order_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ user_id, order_id }) {
+            // Verificar se o pedido existe e pertence ao usuário
+            const existingOrder = yield prisma_1.default.order.findFirst({
+                where: {
+                    id: order_id,
+                    user_id
+                }
+            });
+            if (!existingOrder) {
+                throw new Error("Pedido não encontrado ou você não tem permissão para deletá-lo");
+            }
             const order = yield prisma_1.default.order.delete({
                 where: {
                     id: order_id

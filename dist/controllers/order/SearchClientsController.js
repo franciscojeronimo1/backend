@@ -14,13 +14,24 @@ const SearchClientsService_1 = require("../../services/order/SearchClientsServic
 class SearchClientsController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { search } = req.query;
-            if (!search || typeof search !== 'string') {
-                return res.json([]);
+            try {
+                const { search } = req.query;
+                if (!search || typeof search !== 'string') {
+                    return res.json([]);
+                }
+                const searchClientsService = new SearchClientsService_1.SearchClientsService();
+                const clients = yield searchClientsService.execute({
+                    user_id: req.user_id,
+                    search
+                });
+                return res.json(clients);
             }
-            const searchClientsService = new SearchClientsService_1.SearchClientsService();
-            const clients = yield searchClientsService.execute({ search });
-            return res.json(clients);
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

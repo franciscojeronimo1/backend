@@ -16,16 +16,19 @@ exports.DeleteProductService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class DeleteProductService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ product_id }) {
-            // Verificar se produto existe e se tem itens associados
-            const product = yield prisma_1.default.product.findUnique({
-                where: { id: product_id },
+        return __awaiter(this, arguments, void 0, function* ({ user_id, product_id }) {
+            // Verificar se produto existe, pertence ao usuário e se tem itens associados
+            const product = yield prisma_1.default.product.findFirst({
+                where: {
+                    id: product_id,
+                    user_id
+                },
                 include: {
                     items: true,
                 },
             });
             if (!product) {
-                throw new Error("Produto não encontrado");
+                throw new Error("Produto não encontrado ou você não tem permissão para deletá-lo");
             }
             // Verificar se produto está sendo usado em pedidos
             if (product.items.length > 0) {

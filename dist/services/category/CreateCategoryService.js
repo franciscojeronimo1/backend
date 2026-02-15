@@ -16,7 +16,7 @@ exports.CreateCategoryService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateCategoryService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, has_sizes = false, size_prices = [] }) {
+        return __awaiter(this, arguments, void 0, function* ({ user_id, name, has_sizes = false, size_prices = [] }) {
             if (name === '') {
                 throw new Error("Nome inválido");
             }
@@ -26,6 +26,7 @@ class CreateCategoryService {
             }
             const category = yield prisma_1.default.category.create({
                 data: {
+                    user_id,
                     name,
                     has_sizes,
                     size_prices: has_sizes && size_prices.length > 0 ? {

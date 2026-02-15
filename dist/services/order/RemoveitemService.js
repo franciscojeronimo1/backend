@@ -16,7 +16,20 @@ exports.RemoveItemService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class RemoveItemService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ item_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ user_id, item_id }) {
+            // Verificar se o item existe e o pedido pertence ao usuário
+            const item = yield prisma_1.default.item.findUnique({
+                where: { id: item_id },
+                include: {
+                    order: true
+                }
+            });
+            if (!item) {
+                throw new Error("Item não encontrado");
+            }
+            if (item.order.user_id !== user_id) {
+                throw new Error("Você não tem permissão para remover este item");
+            }
             const order = yield prisma_1.default.item.delete({
                 where: {
                     id: item_id

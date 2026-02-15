@@ -24,6 +24,7 @@ class SalesController {
                 }
                 const salesService = new SalesService_1.SalesService();
                 const result = yield salesService.execute({
+                    user_id: req.user_id,
                     period: period,
                     date: date,
                     start_date: start_date,

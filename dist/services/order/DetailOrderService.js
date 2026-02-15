@@ -16,7 +16,17 @@ exports.DetailOrderService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class DetailOrderService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ order_id }) {
+        return __awaiter(this, arguments, void 0, function* ({ user_id, order_id }) {
+            // Verificar se o pedido existe e pertence ao usuário
+            const order = yield prisma_1.default.order.findFirst({
+                where: {
+                    id: order_id,
+                    user_id
+                }
+            });
+            if (!order) {
+                throw new Error("Pedido não encontrado ou você não tem permissão para acessá-lo");
+            }
             const orders = yield prisma_1.default.item.findMany({
                 where: {
                     order_id: order_id,

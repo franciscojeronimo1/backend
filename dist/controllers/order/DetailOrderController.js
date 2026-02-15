@@ -14,12 +14,21 @@ const DetailOrderService_1 = require("../../services/order/DetailOrderService");
 class DetailOrderController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const order_id = req.query.order_id;
-            const detailOrderService = new DetailOrderService_1.DetailOrderService();
-            const orders = yield detailOrderService.execute({
-                order_id,
-            });
-            return res.json(orders);
+            try {
+                const order_id = req.query.order_id;
+                const detailOrderService = new DetailOrderService_1.DetailOrderService();
+                const orders = yield detailOrderService.execute({
+                    user_id: req.user_id,
+                    order_id,
+                });
+                return res.json(orders);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

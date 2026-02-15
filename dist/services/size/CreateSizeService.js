@@ -16,16 +16,20 @@ exports.CreateSizeService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateSizeService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, display, order }) {
-            // Verificar se já existe
-            const existingSize = yield prisma_1.default.productSize.findUnique({
-                where: { name }
+        return __awaiter(this, arguments, void 0, function* ({ user_id, name, display, order }) {
+            // Verificar se já existe para este usuário
+            const existingSize = yield prisma_1.default.productSize.findFirst({
+                where: {
+                    name,
+                    user_id
+                }
             });
             if (existingSize) {
                 throw new Error("Tamanho já existe");
             }
             const size = yield prisma_1.default.productSize.create({
                 data: {
+                    user_id,
                     name,
                     display,
                     order

@@ -15,9 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListSizesService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class ListSizesService {
-    execute() {
+    execute(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const sizes = yield prisma_1.default.productSize.findMany({
+                where: {
+                    user_id
+                },
                 orderBy: {
                     order: 'asc'
                 }

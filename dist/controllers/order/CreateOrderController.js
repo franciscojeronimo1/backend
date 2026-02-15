@@ -14,15 +14,24 @@ const CreateOrderService_1 = require("../../services/order/CreateOrderService");
 class CreateOrderController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { table, name, address, payment_method } = req.body;
-            const createOrderService = new CreateOrderService_1.CreateOrderService();
-            const order = yield createOrderService.execute({
-                table,
-                name,
-                address,
-                payment_method
-            });
-            return res.json(order);
+            try {
+                const { table, name, address, payment_method } = req.body;
+                const createOrderService = new CreateOrderService_1.CreateOrderService();
+                const order = yield createOrderService.execute({
+                    user_id: req.user_id,
+                    table,
+                    name,
+                    address,
+                    payment_method
+                });
+                return res.json(order);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

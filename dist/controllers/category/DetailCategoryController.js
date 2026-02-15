@@ -17,6 +17,7 @@ class DetailCategoryController {
             const { category_id } = req.params;
             const detailCategoryService = new DetailCategoryService_1.DetailCategoryService();
             const category = yield detailCategoryService.execute({
+                user_id: req.user_id,
                 category_id
             });
             return res.json(category);

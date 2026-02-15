@@ -17,7 +17,10 @@ class DeleteProductController {
             const product_id = req.query.product_id;
             const deleteProductService = new DeleteProductService_1.DeleteProductService();
             try {
-                const product = yield deleteProductService.execute({ product_id });
+                const product = yield deleteProductService.execute({
+                    user_id: req.user_id,
+                    product_id
+                });
                 return res.json(product);
             }
             catch (error) {

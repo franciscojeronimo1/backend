@@ -15,9 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListCategoryService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class ListCategoryService {
-    execute() {
+    execute(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const categories = yield prisma_1.default.category.findMany({
+                where: {
+                    user_id
+                },
                 include: {
                     size_prices: {
                         include: {

@@ -16,10 +16,13 @@ exports.DeleteSizeService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class DeleteSizeService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ size_id }) {
-            // Verificar se tamanho existe
-            const size = yield prisma_1.default.productSize.findUnique({
-                where: { id: size_id },
+        return __awaiter(this, arguments, void 0, function* ({ user_id, size_id }) {
+            // Verificar se tamanho existe e pertence ao usuário
+            const size = yield prisma_1.default.productSize.findFirst({
+                where: {
+                    id: size_id,
+                    user_id
+                },
                 include: {
                     category_prices: true,
                     product_prices: true,
@@ -27,7 +30,7 @@ class DeleteSizeService {
                 },
             });
             if (!size) {
-                throw new Error("Tamanho não encontrado");
+                throw new Error("Tamanho não encontrado ou você não tem permissão para deletá-lo");
             }
             // Verificar se tamanho está sendo usado
             const hasCategoryPrices = size.category_prices.length > 0;

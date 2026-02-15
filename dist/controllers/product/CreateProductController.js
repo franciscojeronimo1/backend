@@ -56,6 +56,7 @@ class CreateProductController {
             // Converter has_custom_prices para boolean se vier como string
             const hasCustomPrices = has_custom_prices === true || has_custom_prices === 'true';
             const product = yield createProductService.execute({
+                user_id: req.user_id,
                 name,
                 price,
                 description,

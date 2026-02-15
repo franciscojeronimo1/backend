@@ -17,7 +17,10 @@ class DeleteCategoryController {
             const category_id = req.query.category_id;
             const deleteCategoryService = new DeleteCategoryService_1.DeleteCategoryService();
             try {
-                const category = yield deleteCategoryService.execute({ category_id });
+                const category = yield deleteCategoryService.execute({
+                    user_id: req.user_id,
+                    category_id
+                });
                 return res.json(category);
             }
             catch (error) {

@@ -15,7 +15,7 @@ class ListSizesController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const listSizesService = new ListSizesService_1.ListSizesService();
-            const sizes = yield listSizesService.execute();
+            const sizes = yield listSizesService.execute(req.user_id);
             return res.json(sizes);
         });
     }

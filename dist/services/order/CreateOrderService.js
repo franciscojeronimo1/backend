@@ -16,16 +16,32 @@ exports.CreateOrderService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateOrderService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ table, name, address, payment_method }) {
-            const order = yield prisma_1.default.order.create({
-                data: {
-                    table: table,
-                    name: name,
-                    address: address ? address.trim() : null,
-                    payment_method: payment_method || null
+        return __awaiter(this, arguments, void 0, function* ({ user_id, table, name, address, payment_method }) {
+            try {
+                const order = yield prisma_1.default.order.create({
+                    data: {
+                        user_id,
+                        table: table,
+                        name: name,
+                        address: address ? address.trim() : null,
+                        payment_method: payment_method || null
+                    }
+                });
+                // Log para debug
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`[CreateOrderService] Order created successfully: ${order.id}`);
                 }
-            });
-            return order;
+                return order;
+            }
+            catch (error) {
+                // Log detalhado do erro
+                console.error('[CreateOrderService] Error creating order:', error);
+                if (error instanceof Error) {
+                    console.error('[CreateOrderService] Error message:', error.message);
+                    console.error('[CreateOrderService] Error stack:', error.stack);
+                }
+                throw error;
+            }
         });
     }
 }

@@ -14,29 +14,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SalesService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
+const dateUtils_1 = require("../../utils/dateUtils");
 class SalesService {
     getDateRange(period, date, start_date, end_date) {
         const now = new Date();
         let start;
         let end;
         switch (period) {
-            case 'day':
+            case "day":
                 if (date) {
-                    start = new Date(date);
-                    start.setHours(0, 0, 0, 0);
-                    end = new Date(date);
-                    end.setHours(23, 59, 59, 999);
+                    start = (0, dateUtils_1.toLocalDateStart)(date);
+                    end = (0, dateUtils_1.toLocalDateEnd)(date);
                 }
                 else {
-                    // Dia atual
                     start = new Date(now);
                     start.setHours(0, 0, 0, 0);
                     end = new Date(now);
                     end.setHours(23, 59, 59, 999);
                 }
                 break;
-            case 'week':
-                // Semana atual (domingo a sábado)
+            case "week":
                 const dayOfWeek = now.getDay();
                 start = new Date(now);
                 start.setDate(now.getDate() - dayOfWeek);
@@ -45,21 +42,18 @@ class SalesService {
                 end.setDate(start.getDate() + 6);
                 end.setHours(23, 59, 59, 999);
                 break;
-            case 'month':
-                // Mês atual
+            case "month":
                 start = new Date(now.getFullYear(), now.getMonth(), 1);
                 start.setHours(0, 0, 0, 0);
                 end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                 end.setHours(23, 59, 59, 999);
                 break;
-            case 'custom':
+            case "custom":
                 if (!start_date || !end_date) {
                     throw new Error("start_date e end_date são obrigatórios para período customizado");
                 }
-                start = new Date(start_date);
-                start.setHours(0, 0, 0, 0);
-                end = new Date(end_date);
-                end.setHours(23, 59, 59, 999);
+                start = (0, dateUtils_1.toLocalDateStart)(start_date);
+                end = (0, dateUtils_1.toLocalDateEnd)(end_date);
                 break;
             default:
                 throw new Error("Período inválido. Use: day, week, month ou custom");
@@ -67,41 +61,31 @@ class SalesService {
         return { start, end };
     }
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ period, date, start_date, end_date }) {
-            if (period === 'custom' && (!start_date || !end_date)) {
+        return __awaiter(this, arguments, void 0, function* ({ user_id, period, date, start_date, end_date }) {
+            if (period === "custom" && (!start_date || !end_date)) {
                 throw new Error("start_date e end_date são obrigatórios para período customizado");
             }
             const { start, end } = this.getDateRange(period, date, start_date, end_date);
             const orders = yield prisma_1.default.order.findMany({
                 where: {
+                    user_id,
                     status: true,
-                    created_at: {
-                        gte: start,
-                        lte: end,
-                    },
+                    created_at: { gte: start, lte: end },
                 },
-                include: {
-                    items: true,
-                },
+                include: { items: true },
             });
-            // Calcular total vendido
             let total = 0;
-            let ordersCount = 0;
             for (const order of orders) {
-                ordersCount++;
                 for (const item of order.items) {
                     total += item.price * item.amount;
                 }
             }
-            const formatDate = (date) => {
-                return date.toISOString().split('T')[0];
-            };
             return {
                 total: Number(total.toFixed(2)),
                 period,
-                start_date: formatDate(start),
-                end_date: formatDate(end),
-                orders_count: ordersCount,
+                start_date: (0, dateUtils_1.formatDateLocal)(start),
+                end_date: (0, dateUtils_1.formatDateLocal)(end),
+                orders_count: orders.length,
             };
         });
     }

@@ -16,13 +16,16 @@ exports.CreateProductService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class CreateProductService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, price, description, banner, category_id, has_custom_prices = false, custom_prices = [], }) {
-            // Verificar se categoria existe
-            const category = yield prisma_1.default.category.findUnique({
-                where: { id: category_id },
+        return __awaiter(this, arguments, void 0, function* ({ user_id, name, price, description, banner, category_id, has_custom_prices = false, custom_prices = [], }) {
+            // Verificar se categoria existe e pertence ao usuário
+            const category = yield prisma_1.default.category.findFirst({
+                where: {
+                    id: category_id,
+                    user_id
+                },
             });
             if (!category) {
-                throw new Error("Categoria não encontrada");
+                throw new Error("Categoria não encontrada ou você não tem permissão para acessá-la");
             }
             // Se categoria não tem tamanhos, produto deve ter preço fixo
             if (!category.has_sizes && !price) {
@@ -48,6 +51,7 @@ class CreateProductService {
             // Mas vamos permitir para compatibilidade com produtos antigos
             const product = yield prisma_1.default.product.create({
                 data: {
+                    user_id,
                     name,
                     price: price ? Number(price) : null,
                     description,

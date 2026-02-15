@@ -16,10 +16,11 @@ exports.DetailCategoryService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class DetailCategoryService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ category_id }) {
-            const category = yield prisma_1.default.category.findUnique({
+        return __awaiter(this, arguments, void 0, function* ({ user_id, category_id }) {
+            const category = yield prisma_1.default.category.findFirst({
                 where: {
-                    id: category_id
+                    id: category_id,
+                    user_id
                 },
                 include: {
                     size_prices: {
@@ -35,7 +36,7 @@ class DetailCategoryService {
                 }
             });
             if (!category) {
-                throw new Error("Categoria não encontrada");
+                throw new Error("Categoria não encontrada ou você não tem permissão para acessá-la");
             }
             return {
                 id: category.id,

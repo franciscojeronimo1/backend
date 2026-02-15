@@ -17,7 +17,10 @@ class DeleteSizeController {
             const size_id = req.query.size_id;
             const deleteSizeService = new DeleteSizeService_1.DeleteSizeService();
             try {
-                const size = yield deleteSizeService.execute({ size_id });
+                const size = yield deleteSizeService.execute({
+                    user_id: req.user_id,
+                    size_id
+                });
                 return res.json(size);
             }
             catch (error) {

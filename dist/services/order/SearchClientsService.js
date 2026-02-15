@@ -16,10 +16,11 @@ exports.SearchClientsService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class SearchClientsService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ search }) {
-            // Busca pedidos onde o nome contém o termo de busca (case insensitive)
+        return __awaiter(this, arguments, void 0, function* ({ user_id, search }) {
+            // Busca pedidos onde o nome contém o termo de busca (case insensitive) e pertence ao usuário
             const orders = yield prisma_1.default.order.findMany({
                 where: {
+                    user_id,
                     name: {
                         not: null,
                         contains: search,

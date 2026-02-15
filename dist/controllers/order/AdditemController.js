@@ -14,17 +14,26 @@ const AdditemService_1 = require("../../services/order/AdditemService");
 class AddItemController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { order_id, product_id, amount, size_id, product_id_2, size_id_2 } = req.body;
-            const addItem = new AdditemService_1.AddItemService();
-            const item = yield addItem.execute({
-                order_id,
-                product_id,
-                amount,
-                size_id,
-                product_id_2,
-                size_id_2
-            });
-            return res.json(item);
+            try {
+                const { order_id, product_id, amount, size_id, product_id_2, size_id_2 } = req.body;
+                const addItem = new AdditemService_1.AddItemService();
+                const item = yield addItem.execute({
+                    user_id: req.user_id,
+                    order_id,
+                    product_id,
+                    amount,
+                    size_id,
+                    product_id_2,
+                    size_id_2
+                });
+                return res.json(item);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

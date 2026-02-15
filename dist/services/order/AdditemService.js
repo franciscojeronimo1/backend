@@ -16,10 +16,13 @@ exports.AddItemService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class AddItemService {
     // Função auxiliar para buscar o preço de um produto
-    getProductPrice(productId, sizeId) {
+    getProductPrice(user_id, productId, sizeId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const product = yield prisma_1.default.product.findUnique({
-                where: { id: productId },
+            const product = yield prisma_1.default.product.findFirst({
+                where: {
+                    id: productId,
+                    user_id
+                },
                 include: {
                     category: {
                         include: {
@@ -38,15 +41,18 @@ class AddItemService {
                 }
             });
             if (!product) {
-                throw new Error("Produto não encontrado");
+                throw new Error("Produto não encontrado ou você não tem permissão para acessá-lo");
             }
             if (sizeId) {
-                // Verificar se tamanho existe
-                const size = yield prisma_1.default.productSize.findUnique({
-                    where: { id: sizeId }
+                // Verificar se tamanho existe e pertence ao usuário
+                const size = yield prisma_1.default.productSize.findFirst({
+                    where: {
+                        id: sizeId,
+                        user_id
+                    }
                 });
                 if (!size) {
-                    throw new Error("Tamanho não encontrado");
+                    throw new Error("Tamanho não encontrado ou você não tem permissão para acessá-lo");
                 }
                 // Se produto tem preços customizados, usar eles
                 if (product.has_custom_prices) {
@@ -75,13 +81,16 @@ class AddItemService {
         });
     }
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ order_id, product_id, amount, size_id, product_id_2, size_id_2 }) {
-            // Verificar se pedido existe
-            const order = yield prisma_1.default.order.findUnique({
-                where: { id: order_id }
+        return __awaiter(this, arguments, void 0, function* ({ user_id, order_id, product_id, amount, size_id, product_id_2, size_id_2 }) {
+            // Verificar se pedido existe e pertence ao usuário
+            const order = yield prisma_1.default.order.findFirst({
+                where: {
+                    id: order_id,
+                    user_id
+                }
             });
             if (!order) {
-                throw new Error("Pedido não encontrado");
+                throw new Error("Pedido não encontrado ou você não tem permissão para acessá-lo");
             }
             // Validações para pizza meia a meia
             if (product_id_2) {
@@ -101,15 +110,21 @@ class AddItemService {
                 if (product_id === product_id_2) {
                     throw new Error("Os sabores devem ser diferentes");
                 }
-                // Buscar ambos os produtos para validação
-                const product1 = yield prisma_1.default.product.findUnique({
-                    where: { id: product_id },
+                // Buscar ambos os produtos para validação (verificando user_id)
+                const product1 = yield prisma_1.default.product.findFirst({
+                    where: {
+                        id: product_id,
+                        user_id
+                    },
                     include: {
                         category: true
                     }
                 });
-                const product2 = yield prisma_1.default.product.findUnique({
-                    where: { id: product_id_2 },
+                const product2 = yield prisma_1.default.product.findFirst({
+                    where: {
+                        id: product_id_2,
+                        user_id
+                    },
                     include: {
                         category: true
                     }
@@ -122,8 +137,8 @@ class AddItemService {
                     throw new Error("Ambos os produtos devem ter tamanhos para pizza meia a meia");
                 }
                 // Buscar preços de ambos os produtos
-                const price1 = yield this.getProductPrice(product_id, size_id);
-                const price2 = yield this.getProductPrice(product_id_2, size_id_2);
+                const price1 = yield this.getProductPrice(user_id, product_id, size_id);
+                const price2 = yield this.getProductPrice(user_id, product_id_2, size_id_2);
                 // Usar o maior preço
                 const finalPrice = Math.max(price1, price2);
                 // Criar item com meia a meia
@@ -148,9 +163,12 @@ class AddItemService {
             }
             else {
                 // Item normal (sem meia a meia)
-                // Buscar produto com categoria e preços
-                const product = yield prisma_1.default.product.findUnique({
-                    where: { id: product_id },
+                // Buscar produto com categoria e preços (verificando user_id)
+                const product = yield prisma_1.default.product.findFirst({
+                    where: {
+                        id: product_id,
+                        user_id
+                    },
                     include: {
                         category: {
                             include: {
@@ -169,9 +187,9 @@ class AddItemService {
                     }
                 });
                 if (!product) {
-                    throw new Error("Produto não encontrado");
+                    throw new Error("Produto não encontrado ou você não tem permissão para acessá-lo");
                 }
-                const price = yield this.getProductPrice(product_id, size_id);
+                const price = yield this.getProductPrice(user_id, product_id, size_id);
                 // Criar item com preço
                 const item = yield prisma_1.default.item.create({
                     data: {

@@ -14,12 +14,21 @@ const SendOrderService_1 = require("../../services/order/SendOrderService");
 class SendOrderController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { order_id } = req.body;
-            const sendOrder = new SendOrderService_1.SendOrderService();
-            const order = yield sendOrder.execute({
-                order_id,
-            });
-            return res.json(order);
+            try {
+                const { order_id } = req.body;
+                const sendOrder = new SendOrderService_1.SendOrderService();
+                const order = yield sendOrder.execute({
+                    user_id: req.user_id,
+                    order_id,
+                });
+                return res.json(order);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

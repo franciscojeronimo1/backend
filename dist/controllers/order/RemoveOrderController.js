@@ -14,10 +14,21 @@ const RemoveOrderService_1 = require("../../services/order/RemoveOrderService");
 class RemoveOrderController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const order_id = req.query.order_id;
-            const removeOrder = new RemoveOrderService_1.RemoveOrderService();
-            const order = yield removeOrder.execute({ order_id });
-            return res.json(order);
+            try {
+                const order_id = req.query.order_id;
+                const removeOrder = new RemoveOrderService_1.RemoveOrderService();
+                const order = yield removeOrder.execute({
+                    user_id: req.user_id,
+                    order_id
+                });
+                return res.json(order);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

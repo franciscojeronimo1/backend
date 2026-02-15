@@ -14,12 +14,21 @@ const FinishOrderService_1 = require("../../services/order/FinishOrderService");
 class FinishOrderController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { order_id } = req.body;
-            const finishOrderService = new FinishOrderService_1.FinishOrderService();
-            const order = yield finishOrderService.execute({
-                order_id,
-            });
-            return res.json(order);
+            try {
+                const { order_id } = req.body;
+                const finishOrderService = new FinishOrderService_1.FinishOrderService();
+                const order = yield finishOrderService.execute({
+                    user_id: req.user_id,
+                    order_id,
+                });
+                return res.json(order);
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    return res.status(400).json({ error: error.message });
+                }
+                return res.status(500).json({ error: "Erro interno do servidor" });
+            }
         });
     }
 }

@@ -1,28 +1,35 @@
 import prismaClient from "../../prisma";
+import {
+  toLocalDateStart,
+  toLocalDateEnd,
+  formatDateLocal,
+} from "../../utils/dateUtils";
 
 interface SalesRequest {
   user_id: string;
-  period: 'day' | 'week' | 'month' | 'custom';
+  period: "day" | "week" | "month" | "custom";
   date?: string;
   start_date?: string;
   end_date?: string;
 }
 
 class SalesService {
-  private getDateRange(period: string, date?: string, start_date?: string, end_date?: string) {
+  private getDateRange(
+    period: string,
+    date?: string,
+    start_date?: string,
+    end_date?: string
+  ) {
     const now = new Date();
     let start: Date;
     let end: Date;
 
     switch (period) {
-      case 'day':
+      case "day":
         if (date) {
-          start = new Date(date);
-          start.setHours(0, 0, 0, 0);
-          end = new Date(date);
-          end.setHours(23, 59, 59, 999);
+          start = toLocalDateStart(date);
+          end = toLocalDateEnd(date);
         } else {
-          // Dia atual
           start = new Date(now);
           start.setHours(0, 0, 0, 0);
           end = new Date(now);
@@ -30,8 +37,7 @@ class SalesService {
         }
         break;
 
-      case 'week':
-        // Semana atual (domingo a sábado)
+      case "week":
         const dayOfWeek = now.getDay();
         start = new Date(now);
         start.setDate(now.getDate() - dayOfWeek);
@@ -41,22 +47,21 @@ class SalesService {
         end.setHours(23, 59, 59, 999);
         break;
 
-      case 'month':
-        // Mês atual
+      case "month":
         start = new Date(now.getFullYear(), now.getMonth(), 1);
         start.setHours(0, 0, 0, 0);
         end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         end.setHours(23, 59, 59, 999);
         break;
 
-      case 'custom':
+      case "custom":
         if (!start_date || !end_date) {
-          throw new Error("start_date e end_date são obrigatórios para período customizado");
+          throw new Error(
+            "start_date e end_date são obrigatórios para período customizado"
+          );
         }
-        start = new Date(start_date);
-        start.setHours(0, 0, 0, 0);
-        end = new Date(end_date);
-        end.setHours(23, 59, 59, 999);
+        start = toLocalDateStart(start_date);
+        end = toLocalDateEnd(end_date);
         break;
 
       default:
@@ -67,47 +72,41 @@ class SalesService {
   }
 
   async execute({ user_id, period, date, start_date, end_date }: SalesRequest) {
-    if (period === 'custom' && (!start_date || !end_date)) {
-      throw new Error("start_date e end_date são obrigatórios para período customizado");
+    if (period === "custom" && (!start_date || !end_date)) {
+      throw new Error(
+        "start_date e end_date são obrigatórios para período customizado"
+      );
     }
 
-    const { start, end } = this.getDateRange(period, date, start_date, end_date);
+    const { start, end } = this.getDateRange(
+      period,
+      date,
+      start_date,
+      end_date
+    );
 
     const orders = await prismaClient.order.findMany({
       where: {
         user_id,
         status: true,
-        created_at: {
-          gte: start,
-          lte: end,
-        },
+        created_at: { gte: start, lte: end },
       },
-      include: {
-        items: true,
-      },
+      include: { items: true },
     });
 
-    // Calcular total vendido
     let total = 0;
-    let ordersCount = 0;
-
     for (const order of orders) {
-      ordersCount++;
       for (const item of order.items) {
         total += item.price * item.amount;
       }
     }
 
-    const formatDate = (date: Date) => {
-      return date.toISOString().split('T')[0];
-    };
-
     return {
       total: Number(total.toFixed(2)),
       period,
-      start_date: formatDate(start),
-      end_date: formatDate(end),
-      orders_count: ordersCount,
+      start_date: formatDateLocal(start),
+      end_date: formatDateLocal(end),
+      orders_count: orders.length,
     };
   }
 }

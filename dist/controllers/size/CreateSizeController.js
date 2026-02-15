@@ -17,6 +17,7 @@ class CreateSizeController {
             const { name, display, order } = req.body;
             const createSizeService = new CreateSizeService_1.CreateSizeService();
             const size = yield createSizeService.execute({
+                user_id: req.user_id,
                 name,
                 display,
                 order

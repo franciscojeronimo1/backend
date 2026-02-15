@@ -15,7 +15,7 @@ class ListOrderController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const listOrderService = new ListOrderService_1.ListOrderService();
-            const orders = yield listOrderService.execute();
+            const orders = yield listOrderService.execute(req.user_id);
             return res.json(orders);
         });
     }

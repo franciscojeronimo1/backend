@@ -17,6 +17,7 @@ class CreateCategoryController {
             const { name, has_sizes, size_prices } = req.body;
             const createCategoryService = new CreateCategoryService_1.CreateCategoryService();
             const category = yield createCategoryService.execute({
+                user_id: req.user_id,
                 name,
                 has_sizes,
                 size_prices

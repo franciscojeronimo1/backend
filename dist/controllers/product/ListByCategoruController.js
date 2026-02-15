@@ -16,7 +16,10 @@ class ListByCategoryController {
         return __awaiter(this, void 0, void 0, function* () {
             const category_id = req.query.category_id;
             const listByCategory = new ListByCategoryService_1.ListByCategoryService();
-            const products = yield listByCategory.execute({ category_id });
+            const products = yield listByCategory.execute({
+                user_id: req.user_id,
+                category_id
+            });
             return res.json(products);
         });
     }

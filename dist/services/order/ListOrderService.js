@@ -15,10 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ListOrderService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 class ListOrderService {
-    execute() {
+    execute(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const orders = yield prisma_1.default.order.findMany({
                 where: {
+                    user_id,
                     drafted: false,
                     status: false,
                 },

@@ -15,7 +15,7 @@ class ListCategoryController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const listCategoryService = new ListCategoryService_1.ListCategoryService();
-            const category = yield listCategoryService.execute();
+            const category = yield listCategoryService.execute(req.user_id);
             return res.json(category);
         });
     }
