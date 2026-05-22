@@ -24,6 +24,7 @@ model User {
   name      String
   email     String   @unique
   password  String
+  ativo     Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
 

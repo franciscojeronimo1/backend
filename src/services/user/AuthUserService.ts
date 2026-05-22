@@ -25,6 +25,10 @@ class AuthUserService {
             throw new Error("User/Password incorrect")
         }
 
+        if (!user.ativo) {
+            throw new Error("Conta desativada. Contate com o desenvolvedor.")
+        }
+
         const token = sign(
             {
                 name: user.name,
@@ -33,7 +37,7 @@ class AuthUserService {
             process.env.JWT_SECRET,
             {
                 subject: user.id,
-                expiresIn: "30d"
+                expiresIn: "7d"
             }
         )
         return {
