@@ -4,6 +4,7 @@ import multer from 'multer'
 import { CreateUserController  } from './controllers/user/CreateUserController'
 import { AuthUserController } from './controllers/user/AuthUserController'
 import { DatailsUserController } from './controllers/user/DatailsUserController'
+import { UpdatePasswordController } from './controllers/user/UpdatePasswordController'
 
 import { CreateCategoryController } from './controllers/category/CreateCategoryController'
 import { ListCategoryController } from './controllers/category/ListCategoryController'
@@ -45,6 +46,8 @@ router.post('/users', new CreateUserController().handle)
 router.post('/session', new AuthUserController().handle)
 
 router.get('/me',isAuthenticated, new DatailsUserController().handle)
+
+router.put('/users/password', isAuthenticated, new UpdatePasswordController().handle)
 
 // -- ROTAS CATEGORY --
 router.post('/category', isAuthenticated, new CreateCategoryController().handle)
